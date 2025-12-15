@@ -13,7 +13,7 @@ class ViT(nn.Module):
         self.encoder = nn.Sequential(*[
             # 63 + 1 experts choose 4, use MOE for last-two even blocks from GMoE paper
             EncoderMOE(num_experts=63, expert_size=128, k=4, tau=1, bias_param=0.01, embed_dim=embed_dim, num_heads=num_heads, bn=bn, pn=num_patches+1) 
-            if (i == (len(num_blocks) - 4)) or (i == (len(num_blocks) - 2))
+            if (i == num_blocks-4) or (i == num_blocks-2)
             else EncoderMLP(embed_dim, num_heads)
             for i in range(num_blocks)
         ])
