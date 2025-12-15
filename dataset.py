@@ -4,6 +4,7 @@ from PIL import Image
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from torchvision import transforms
+Image.MAX_IMAGE_PIXELS = None
 
 class ImgResize(object):
     def __call__(self, img: Image, output_size=(224,224)):
