@@ -9,6 +9,7 @@ class ViT(nn.Module):
         super().__init__()
         num_patches = (img_size ** 2) // (patch_size ** 2)
         self.embed = PatchEmbed(patch_size, num_patches, embed_dim)
+        self.dev = 'cuda' if torch.cuda.is_available() else 'cpu'
 
         self.encoder = nn.Sequential(*[
             # 63 + 1 experts choose 4, use MOE for last-two even blocks from GMoE paper
@@ -45,7 +46,7 @@ class ViT(nn.Module):
         file_path = os.path.join(model_folder_path, file_name)
 
         if os.path.exists(file_path):
-            load_model = torch.load(file_path, map_location=torch.device('cpu'))
+            load_model = torch.load(file_path, map_location=torch.device(self.dev))
 
             self.load_state_dict(load_model['model_state_dict'])
             

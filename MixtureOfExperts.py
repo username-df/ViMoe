@@ -16,9 +16,8 @@ class MOE(nn.Module):
         self.avg_load = bn * pn * k / num_experts
 
         # self.router = nn.Linear(embed_size, num_experts)
-        self.Wlinear = nn.Linear(self.embsize, self.embsize, bias=False).to('cuda:0')
-        self.learnedE = nn.Parameter(torch.randn(self.num_experts, self.embsize)).to('cuda:0')
-
+        self.Wlinear = nn.Linear(self.embsize, self.embsize, bias=False)
+        self.learnedE = nn.Parameter(torch.randn(self.num_experts, self.embsize))
         self.expert_list = nn.ModuleList([
             nn.Sequential(
                 nn.Linear(embed_size, expert_size),
@@ -59,7 +58,7 @@ class MOE(nn.Module):
         if self.training:
             with torch.no_grad():
                 update_bias = torch.tensor([((k_idx == e).sum().item()) for e in range(self.num_experts)])
-                self.bias += (self.bias_param * (torch.sign(update_bias - self.avg_load)).to('cuda:0'))
+                self.bias += (self.bias_param * (torch.sign(update_bias - self.avg_load))).to(self.bias.device)
 
         # For each expert, calculate on group of images that expert was selected for
         result = torch.zeros_like(patches)
