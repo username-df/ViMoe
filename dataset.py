@@ -2,7 +2,6 @@ from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
 from PIL import Image
 from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
 from torchvision import transforms
 Image.MAX_IMAGE_PIXELS = None
 
@@ -47,8 +46,8 @@ transform = transforms.Compose([
     PadToSquare(),
     transforms.ToTensor(),
     transforms.RandomErasing(p=0.5, scale=(0.02, 0.33), ratio=(0.3, 3.3), value=0),
-    transforms.Normalize(mean=[0.3530, 0.3320, 0.3074],
-                         std=[0.3301, 0.3119, 0.3061])
+    transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                         std=[0.229, 0.224, 0.225])
 ])
 
 dataset=ImageFolder("archive", transform=transform)
