@@ -14,7 +14,7 @@ model = model.to(device)
 epochs = 25
 LR = 1e-3
 optimizer = torch.optim.AdamW(params=model.parameters(), betas=(0.9, 0.999), weight_decay=0.1)
-lossfn = nn.CrossEntropyLoss()
+lossfn = nn.CrossEntropyLoss(label_smoothing=0.2)
 
 schedule = get_cosine_schedule_with_warmup(
     optimizer=optimizer,
