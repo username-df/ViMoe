@@ -8,7 +8,7 @@ class ViT(nn.Module):
     def __init__(self, img_size, patch_size, embed_dim, num_heads, num_blocks, num_classes, bn):
         super().__init__()
         num_patches = (img_size ** 2) // (patch_size ** 2)
-        self.embed = PatchEmbed(patch_size, num_patches, embed_dim)
+        self.embed = PatchEmbed(patch_size, embed_dim)
 
         self.encoder = nn.Sequential(*[
             # 63 + 1 experts choose 4, use MOE for last-two even blocks from GMoE paper
