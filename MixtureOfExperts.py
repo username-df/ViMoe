@@ -15,9 +15,7 @@ class MOE(nn.Module):
 
         self.avg_load = bn * pn * k / num_experts
 
-        # self.router = nn.Linear(embed_size, num_experts)
-        self.Wlinear = nn.Linear(self.embsize, self.embsize, bias=False)
-        self.learnedE = nn.Parameter(torch.randn(self.num_experts, self.embsize))
+        self.router = nn.Linear(embed_size, num_experts)
         self.expert_list = nn.ModuleList([
             nn.Sequential(
                 nn.Linear(embed_size, expert_size),
@@ -28,24 +26,13 @@ class MOE(nn.Module):
         ])
     
     def forward(self, x):
-        # experts will work on the entire image instead of individual patches/tokens 
-        # Use CLS token for router according to Vi-MOE paper
-
         # Linear Router:
-        # routed = self.router(x)
+        routed = self.router(x)
+        bn, pn, ne = routed.shape
+        routed = routed.view(bn*pn, ne)
 
-        # if self.training:
-        #    probabilities = torch.softmax((routed + torch.randn_like(routed) + self.bias[:len(routed)]), dim=1)
-        # else:
-        #    probabilities = torch.softmax((routed + self.bias[:len(routed)]), dim=1)
-
-        # Using cosine router from GMoE paper
         bn, pn, ps = x.shape
         patches = x.view(bn*pn, ps)
-
-        proj = F.normalize(self.Wlinear(patches), p=2, dim=-1)
-        learnedE = F.normalize(self.learnedE, p=2, dim=-1)
-        routed = torch.matmul(proj, learnedE.T)
         
         if self.training:
             probabilities = torch.softmax((routed + torch.randn_like(routed) + self.bias[:len(routed)]) / self.tau, dim=1)
@@ -53,12 +40,13 @@ class MOE(nn.Module):
             probabilities = torch.softmax((routed + self.bias[:len(routed)]) / self.tau, dim=1)
 
         k_probs, k_idx = torch.topk(probabilities, k=self.k, dim=1)
+        print(k_idx)
 
         # Auxiliary Loss-Free Load Balancing -> adjust bias depending on amount of images given to each expert
         if self.training:
             with torch.no_grad():
                 update_bias = torch.tensor([((k_idx == e).sum().item()) for e in range(self.num_experts)])
-                self.bias += (self.bias_param * (torch.sign(update_bias - self.avg_load))).to(self.bias.device)
+                self.bias += (self.bias_param * (torch.sign(self.avg_load - update_bias))).to(self.bias.device)
 
         # For each expert, calculate on group of images that expert was selected for
         result = torch.zeros_like(patches)
