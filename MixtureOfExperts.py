@@ -1,6 +1,5 @@
 import torch
 from torch import nn
-import torch.nn.functional as F
 
 class MOE(nn.Module):
     def __init__(self, num_experts, expert_size, k, tau, bias_param, embed_size, bn, pn):
@@ -40,7 +39,6 @@ class MOE(nn.Module):
             probabilities = torch.softmax((routed + self.bias[:len(routed)]) / self.tau, dim=1)
 
         k_probs, k_idx = torch.topk(probabilities, k=self.k, dim=1)
-        print(k_idx)
 
         # Auxiliary Loss-Free Load Balancing -> adjust bias depending on amount of images given to each expert
         if self.training:
