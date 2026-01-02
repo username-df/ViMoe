@@ -12,6 +12,7 @@ transform = v2.Compose([
     v2.ToImage(),
     v2.Resize(256, antialias=True),
     v2.CenterCrop(224),
+    v2.RandomApply([v2.GaussianBlur(kernel_size=3, sigma=(0.1, 2.0))], p=0.5),
     v2.RandomApply([v2.JPEG((30, 90))], p=0.5),
     v2.ToDtype(torch.float32, scale=True),
     v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
