@@ -9,7 +9,7 @@ class MOE(nn.Module):
         self.k = k
         self.tau = tau
 
-        self.register_buffer('bias', torch.zeros(bn*pn, num_experts))
+        self.register_buffer('bias', torch.zeros(num_experts))
         self.bias_param = bias_param
 
         self.avg_load = bn * pn * k / num_experts
@@ -34,16 +34,16 @@ class MOE(nn.Module):
         patches = x.view(bn*pn, ps)
         
         if self.training:
-            probabilities = torch.softmax((routed + torch.randn_like(routed) + self.bias[:len(routed)]) / self.tau, dim=1)
+            probabilities = torch.softmax((routed + torch.randn_like(routed) + self.bias) / self.tau, dim=1)
         else:
-            probabilities = torch.softmax((routed + self.bias[:len(routed)]) / self.tau, dim=1)
+            probabilities = torch.softmax((routed + self.bias) / 1.0, dim=1)
 
         k_probs, k_idx = torch.topk(probabilities, k=self.k, dim=1)
 
         # Auxiliary Loss-Free Load Balancing -> adjust bias depending on amount of images given to each expert
         if self.training:
             with torch.no_grad():
-                update_bias = torch.tensor([((k_idx == e).sum().item()) for e in range(self.num_experts)])
+                update_bias = torch.bincount(k_idx.view(-1), minlength=self.num_experts)
                 self.bias += (self.bias_param * (torch.sign(self.avg_load - update_bias))).to(self.bias.device)
 
         # For each expert, calculate on group of images that expert was selected for
