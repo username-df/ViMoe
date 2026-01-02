@@ -8,12 +8,12 @@ class ViT(nn.Module):
     def __init__(self, img_size, patch_size, embed_dim, num_heads, num_blocks, num_classes, bn):
         super().__init__()
         num_patches = (img_size ** 2) // (patch_size ** 2)
-        self.embed = PatchEmbed(patch_size, embed_dim)
+        self.embed = PatchEmbed(patch_size, num_patches, embed_dim)
 
         self.encoder = nn.Sequential(*[
-            # 63 + 1 experts choose 4, use MOE for last-two even blocks from GMoE paper
-            EncoderMOE(num_experts=63, expert_size=128, k=4, tau=1, bias_param=0.01, embed_dim=embed_dim, num_heads=num_heads, bn=bn, pn=num_patches+1) 
-            if (i == num_blocks-4) or (i == num_blocks-2)
+            # 64 + 1 experts choose 2, use MOE for last-two even blocks from GMoE paper
+            EncoderMOE(num_experts=64, expert_size=128, k=2, tau=5, bias_param=0.1, embed_dim=embed_dim, num_heads=num_heads, bn=bn, pn=num_patches+1) 
+            if i % 2 == 1
             else EncoderMLP(embed_dim, num_heads)
             for i in range(num_blocks)
         ])
