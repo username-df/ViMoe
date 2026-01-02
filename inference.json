@@ -1,0 +1,7 @@
+{
+  "name": "inference",
+  "description": "AI Image Detector Native Host",
+  "path": "inference.bat",
+  "type": "stdio",
+  "allowed_extensions": ["inference@example.org"]
+}
