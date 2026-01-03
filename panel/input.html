@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      background-image: url("template.jpg");
+    }
+
+    #drop-zone {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 200px;
+      max-width: 100%;
+      height: 100px;
+      padding: 1em;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
+      color: slategray;
+      cursor: pointer;
+    }
+
+    #file-input {
+      display: none;
+    }
+
+    #preview {
+      width: 500px;
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+      list-style: none;
+      padding: 0;
+    }
+
+    #preview img {
+      width: 256px;
+      height: 256px;
+      object-fit: cover;
+    }
+  </style>
+<body>
+  <label id="drop-zone">
+  Click to upload an image file.
+  <input type="file" id="file-input" multiple accept="image/*" />
+  </label>
+  <ul id="preview"></ul>
+  <div id="result">...</div>
+  <script src="processInput.js"></script>
+</body>
+</html>
