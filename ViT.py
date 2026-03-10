@@ -2,16 +2,18 @@ import os
 import torch
 from torch import nn
 from PatchEmbed import PatchEmbed
-from Encoder import Encoder
+from Encoder import EncoderMLP, EncoderMOE
 
 class ViT(nn.Module):
-    def __init__(self, img_size, patch_size, embed_dim, num_heads, num_blocks, num_classes):
+    def __init__(self, img_size, patch_size, embed_dim, num_heads, num_blocks, num_classes, bn):
         super().__init__()
         num_patches = (img_size ** 2) // (patch_size ** 2)
         self.embed = PatchEmbed(patch_size, num_patches, embed_dim)
 
         self.encoder = nn.Sequential(*[
-            Encoder(embed_dim, num_heads) for _ in range(num_blocks)
+            EncoderMLP(embed_dim, num_heads) if i%2 == 0
+            else EncoderMOE(64, 128, 2, 0.1, embed_dim, num_heads, bn, num_patches+1)
+            for i in range(num_blocks)
         ])
 
         self.final_MLP =  nn.Linear(embed_dim, num_classes)
@@ -41,7 +43,7 @@ class ViT(nn.Module):
         file_path = os.path.join(model_folder_path, file_name)
 
         if os.path.exists(file_path):
-            load_model = torch.load(file_path, map_location=torch.device('cpu'))
+            load_model = torch.load(file_path, map_location=torch.device('cuda'))
 
             self.load_state_dict(load_model['model_state_dict'])
             
