@@ -1,10 +1,10 @@
-# ViT From Scratch
+# ViMoe From Scratch
 
 <div style="display: flex;">
   <img src="https://github.com/user-attachments/assets/16d9122e-390e-4e1c-8614-8bfefb6e2d02" width="500" style="margin-right: 20px;" />
 </div>
 
-The transformer is usually used for natural language processing, but the Vision Transformer (ViT) is the application of the transformer encoder for computer vision tasks.
+The transformer is usually used for natural language processing, but the Vision Transformer (ViT) is the application of the transformer encoder for computer vision tasks. 
 
 ## Patch Embedding
 
@@ -82,21 +82,30 @@ Multi-Head Attention is an extension of Self-Attention, where instead of doing S
   <img src="https://github.com/user-attachments/assets/3f029e55-7092-4112-ad9e-2fb819c40a0e" width=650 style="margin-right: 20px;" />
 </div>
 
+## Mixture of Experts
+
+<img width="520" height="520" alt="b6a623a4-fdbc-4abf-883b-3c2679b4ad4d_1460x640" src="https://github.com/user-attachments/assets/ac2c37e7-1e42-4ed7-b067-00a457b61190" />
+
+Mixture of Experts (MOE) works by utilizing a router to assign a small number of experts to each patch in the image, the output for that patch is a weighted sum of the outputs from the selected experts. The idea is to only activate specific experts when certain shapes or textures are found in images.
+
+To prevent expert collapse, where only a few experts are used for every single patch, auxiliary-loss free load balancing is used to ensure the number of patches assigned to each expert is around the expected average. This is done by using a bias term to increase the probability of selecting the experts that were not used as much.
+
+<img width="682" height="841" alt="Screenshot 2026-03-10 115814" src="https://github.com/user-attachments/assets/ae2095aa-84bf-4999-ad37-91087c75962a" />
+
 ## Transformer Encoder
 
-The Transformer Encoder takes Multi-Head Attention and adds skip connections, layer norm and a multi-layer perceptron. 
+The Transformer Encoder takes Multi-Head Attention and adds skip connections, layer norm and a multi-layer perceptron (MLP). 
 
-<div style="display: flex;">
-  <img src="https://github.com/user-attachments/assets/55e58f66-10c2-4ffb-8dde-fee0e6f0cb0b" width=200 style="margin-right: 20px;" />
-  <img src="https://github.com/user-attachments/assets/bd244db8-bc20-41d4-a044-a199c839118e" width=400 style="margin-right: 20px;" />
-</div>
+<img width="1208" height="200" alt="image" src="https://github.com/user-attachments/assets/6691b18d-847b-4721-8a1c-8e51382d4ed9" />
+
+In every other encoder block, Sparse Mixture of Experts replaces the MLP; this allows for lower computational costs while maintaining overall model performance and quality, which improves model scalability.
 
 ## Vision Transformer (ViT)
 
 The Vision Transformer utilizes multiple encoder blocks and uses the final CLS token as input to a MLP, which acts as a classifier for the image.
 
 <div style="display: flex;">
-  <img src="https://github.com/user-attachments/assets/1bdf7968-97e4-4fdc-8155-7808c9084fc5" width=550 style="margin-right: 20px;" />
+  <img src="https://github.com/user-attachments/assets/e46abc9b-db61-419c-a6f2-44054033a75b" width=550 style="margin-right: 20px;" />
 </div>
 
 ## Training
