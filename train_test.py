@@ -5,21 +5,22 @@ from ViT import ViT
 import matplotlib.pyplot as plt
 from dataset import train_data, test_data
 from torchmetrics.classification import MulticlassAccuracy
+from tqdm import tqdm
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 torch.manual_seed(0)
-model = ViT(img_size=32, patch_size=4, embed_dim=256, num_heads=4, num_blocks=6, num_classes=10)
+model = ViT(img_size=32, patch_size=4, embed_dim=512, num_heads=4, num_blocks=6, num_classes=10, bn=train_data.batch_size)
 model = model.to(device) 
    
 epochs = 100
 
 LR = 1e-3 
-optimizer = torch.optim.AdamW(params=model.parameters(), betas=(0.9, 0.999), weight_decay=0.1)
+optimizer = torch.optim.AdamW(params=model.parameters(), lr=LR, betas=(0.9, 0.999), weight_decay=0.1)
 
 schedule = get_cosine_schedule_with_warmup(
     optimizer=optimizer,
-    num_warmup_steps=1000,
+    num_warmup_steps=10000,
     num_training_steps=epochs*len(train_data)
 )
  
@@ -37,7 +38,7 @@ def loss_curves(epochs, train, test):
 
 train_hst, test_hst = [], []
 
-for epoch in range(epochs):
+for epoch in tqdm(range(epochs)):
     #------------- Train ----------------
     train_loss, train_acc = 0, 0
     
