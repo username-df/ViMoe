@@ -13,7 +13,7 @@ torch.manual_seed(0)
 model = ViT(img_size=32, patch_size=4, embed_dim=256, num_heads=8, num_blocks=12, num_classes=10, bn=train_data.batch_size)
 model = model.to(device) 
    
-epochs = 100
+epochs = 300
 
 LR = 1e-4
 optimizer = torch.optim.AdamW(params=model.parameters(), lr=LR, betas=(0.9, 0.999))
