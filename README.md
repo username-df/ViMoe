@@ -119,7 +119,7 @@ To train a Vision Transformer, multiple regularization techniques are required. 
 - label smoothing
 
 <div style="display: flex;">
-  <img src="https://github.com/user-attachments/assets/750ac2cd-ce0f-42ab-8336-3a130fc93704" width=550 style="margin-right: 20px;" />
+  <img src="https://github.com/user-attachments/assets/a26019c9-1525-448e-88a6-6eeb42305e4d" width=550 style="margin-right: 20px;" />
 </div>
 
-The model achieved around 77% test accuracy on CIFAR10 after 100 epochs.
+The model achieved around 76% test accuracy on CIFAR10 after 300 epochs.
