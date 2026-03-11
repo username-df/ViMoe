@@ -12,14 +12,14 @@ class MOE(nn.Module):
         self.bias_param = bias_param
 
         self.avg_load = bn * pn * k / num_experts
-
+        self.dropout = nn.Dropout(p=0.1)
+        
         self.router = nn.Linear(embed_size, num_experts)
         self.expert_list = nn.ModuleList([
             nn.Sequential(
                 nn.Linear(embed_size, expert_size),
                 nn.GELU(),
-                nn.Linear(expert_size, embed_size),
-                nn.Dropout(p=0.1)
+                nn.Linear(expert_size, embed_size)
             ) for _ in range(num_experts+1) # 1 shared expert
         ])
     
@@ -60,4 +60,4 @@ class MOE(nn.Module):
 
         result = result + self.expert_list[-1](patches)
         result = result.view(bn, pn, ps)
-        return result
+        return self.dropout(result)
